@@ -1,0 +1,66 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+    image: laundryy-syifa
+    container_name: laundryy-syifa
+    restart: unless-stopped
+    tty: true
+    environment:
+      SERVICE_NAME: app
+    working_dir: /var/www/laundryy-syifa
+    volumes:
+      - .:/var/www/laundryy-syifa/
+      - ./storage/php.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - laundryy-syifa
+
+  webserver:
+    image: nginx:alpine
+    container_name: nginxlaundryy-syifa
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "2022:80"
+    volumes:
+      - .:/var/www/laundryy-syifa
+      - ./storage/:/etc/nginx/conf.d/
+    networks:
+      - laundryy-syifa
+
+  db:
+    image: mysql:5.7
+    container_name: dblaundryy-syifa
+    restart: always
+    tty: true
+    ports:
+      - "20222:3306"
+    volumes:
+      - lbdata:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: syifa123
+      MYSQL_DATABASE: homestead2091
+    networks:
+      - laundryy-syifa
+
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: pmalaundryy-syifa
+    links:
+      - db
+    restart: always
+    ports:
+      - "7000:80"
+    networks:
+      - laundryy-syifa
+
+networks:
+  laundryy-syifa:
+    driver: bridge
+
+volumes:
+  lbdata:
+    driver: local
